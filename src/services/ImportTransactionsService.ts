@@ -23,12 +23,10 @@ class ImportTransactionsService {
     const createTransactionService = new CreateTransactionService();
     const transactions: Transaction[] = [];
 
-    const fileContent = await fs.promises.readFile(
-      path.join(uploadConfig.directory, filename),
-      'utf-8',
-    );
+    const filePath = path.join(uploadConfig.directory, filename);
+    const fileContent = await fs.promises.readFile(filePath, 'utf-8');
 
-    const lines = fileContent.trim().split('\n');
+    const lines = fileContent.trim().split(/\r?\n/);
     lines.splice(0, 1);
 
     for (const line of lines) {
@@ -43,6 +41,8 @@ class ImportTransactionsService {
 
       transactions.push(transaction);
     }
+
+    await fs.promises.unlink(filePath);
 
     return transactions;
   }
